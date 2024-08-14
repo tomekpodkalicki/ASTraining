@@ -9,6 +9,9 @@ import com.example.myapplication.adapters.ContactAdapter
 import com.example.myapplication.data.Contact
 import com.example.myapplication.databinding.ActivitySecondBinding
 import com.example.myapplication.viewmodels.SecondViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SecondActivity : AppCompatActivity() {
 
@@ -23,6 +26,21 @@ class SecondActivity : AppCompatActivity() {
 
 
         binding.recycler1.layoutManager = LinearLayoutManager(applicationContext)
+
+        CoroutineScope(Dispatchers.Main).launch {
+           vm.contactFlow.collect { contact ->
+               binding.recycler1.adapter = ContactAdapter(
+                   contactsList = listOf(contact),
+                   callListener = {
+                       Toast.makeText(applicationContext, "Call to number to ${it}", Toast.LENGTH_SHORT).show()
+                   },
+                   smsListener = {
+                       Toast.makeText(applicationContext, "Send sms to ${it}", Toast.LENGTH_SHORT).show()
+                   })
+
+           }
+        }
+/*
         vm.contacts.observe(this) { contactList ->
             binding.recycler1.adapter = ContactAdapter(
                 contactsList = contactList,
@@ -32,7 +50,7 @@ class SecondActivity : AppCompatActivity() {
                 smsListener = {
                     Toast.makeText(applicationContext, "Send sms to ${it}", Toast.LENGTH_SHORT).show()
                 })
-        }
+        }*/
         vm.updateContactList()
     }
 }
